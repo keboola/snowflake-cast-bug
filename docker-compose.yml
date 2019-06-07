@@ -1,0 +1,26 @@
+version: '2'
+services:
+  tests: &base
+    build:
+      context: .
+  dev:
+    <<: *base
+    volumes:
+      - ./:/code
+  apache:
+    build:
+      context: .
+    image: connection_apache
+    volumes:
+      # please make sure you update the volumes in apache-xdebug below as well
+      - ./:/var/www/html:cached
+      - ./docker/php-apache/connection.conf:/etc/apache2/sites-enabled/connection.conf
+      - ./docker/php-apache/logging.conf:/etc/apache2/conf-enabled/keboola-logging.conf
+      - ./docker/php-apache/snowflake/simba.snowflake.ini:/usr/lib/snowflake/odbc/lib/simba.snowflake.ini
+      - ./docker/php-apache/php.ini:/usr/local/etc/php/php.ini
+    working_dir: /var/www/html
+    ports:
+      - "8800:80"
+    environment:
+      - APPLICATION_ENV=development
+    command: sh -c 'apache2-foreground'
