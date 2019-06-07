@@ -42,11 +42,11 @@ class SnowflakeConnection
     public function __construct()
     {
         $dsn = 'Driver=SnowflakeDSIIDriver;';
-        $dsn .= 'Server='.getenv('SNOWFLAKE_SERVER').';';
+        $dsn .= 'Server=' . getenv('SNOWFLAKE_SERVER') . ';';
         $dsn .= 'Port=443;';
         $dsn .= 'Tracing=0;';
         $dsn .= 'Database="' . getenv('SNOWFLAKE_DATABASE') . '";';
-        $dsn .= 'Warehouse="DEV"';
+        $dsn .= 'Warehouse="' . getenv('SNOWFLAKE_WAREHOUSE') . '"';
 
         $attemptNumber = 0;
         $maxBackoffAttempts = 5;
