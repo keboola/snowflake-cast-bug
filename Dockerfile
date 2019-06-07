@@ -1,14 +1,18 @@
 FROM ubuntu:18.04
 RUN apt-get update
 RUN apt-get install \
-                curl \
-                mc \
-                -y
+        curl \
+        mc \
+        -y
 
 RUN /usr/bin/curl https://sfc-repo.snowflakecomputing.com/odbc/linux/2.19.3/snowflake-odbc-2.19.3.x86_64.deb -o /tmp/snowflake-odbc.deb
 
 FROM php:7.1-apache
 MAINTAINER Ondřej Jodas <ondrej.jodas@keboola.com>
+
+ARG COMPOSER_FLAGS="--prefer-dist --no-interaction --classmap-authoritative"
+
+ENV LANG en_US.UTF-8
 
 RUN apt-get update -q \
    && apt-get install \
@@ -54,3 +58,14 @@ RUN set -ex; \
 COPY --from=0 /tmp/snowflake-odbc.deb /tmp/snowflake-odbc.deb
 RUN dpkg -i /tmp/snowflake-odbc.deb
 ADD ./docker/php-apache/snowflake/simba.snowflake.ini /usr/lib/snowflake/odbc/lib/simba.snowflake.ini
+
+WORKDIR /var/www/html
+
+## Composer - deps always cached unless changed
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer
+
+# First copy only composer files
+
+COPY composer.* ./
+# Download dependencies, but don't run scripts or init autoloaders as the app is missing
+RUN composer install

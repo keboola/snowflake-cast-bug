@@ -1,12 +1,5 @@
 version: '2'
 services:
-  tests: &base
-    build:
-      context: .
-  dev:
-    <<: *base
-    volumes:
-      - ./:/code
   apache:
     build:
       context: .
@@ -20,7 +13,7 @@ services:
       - ./docker/php-apache/php.ini:/usr/local/etc/php/php.ini
     working_dir: /var/www/html
     ports:
-      - "8800:80"
+      - "8080:80"
     environment:
       - APPLICATION_ENV=development
     command: sh -c 'apache2-foreground'
