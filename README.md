@@ -6,3 +6,7 @@
 - run `docker-compose run --rm apache composer install`
 - run `docker-compose up apache`
 - open browser http://localhost:8080
+
+## Redshift
+
+- open browser http://localhost:8080/redshift.php
