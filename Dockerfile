@@ -6,6 +6,8 @@ RUN apt-get install \
         -y
 
 RUN /usr/bin/curl https://sfc-repo.snowflakecomputing.com/odbc/linux/2.19.3/snowflake-odbc-2.19.3.x86_64.deb -o /tmp/snowflake-odbc.deb
+RUN /usr/bin/curl https://s3.amazonaws.com/redshift-downloads/drivers/odbc/1.4.6.1000/AmazonRedshiftODBC-64-bit-1.4.6.1000-1.x86_64.deb -o /tmp/redshift-odbc.deb
+
 
 FROM php:7.1-apache
 MAINTAINER Ondřej Jodas <ondrej.jodas@keboola.com>
@@ -58,6 +60,12 @@ RUN set -ex; \
 COPY --from=0 /tmp/snowflake-odbc.deb /tmp/snowflake-odbc.deb
 RUN dpkg -i /tmp/snowflake-odbc.deb
 ADD ./docker/php-apache/snowflake/simba.snowflake.ini /usr/lib/snowflake/odbc/lib/simba.snowflake.ini
+
+# Redshift ODBC
+COPY --from=0 /tmp/redshift-odbc.deb /tmp/redshift-odbc.deb
+RUN dpkg -i /tmp/redshift-odbc.deb
+ADD ./docker/php-apache/redshift/odbcinst.ini /tmp/redshift/odbcinst.ini
+RUN cat /tmp/redshift/odbcinst.ini >> /etc/odbcinst.ini
 
 WORKDIR /var/www/html
 
