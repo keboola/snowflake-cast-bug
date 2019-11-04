@@ -12,10 +12,10 @@ $randomString1 = createRandomString(20000, "🐱️👬🐇🐐🦖");
 $randomString2 = createRandomString(20000, "🐱️👬🐇🐐🦖");
 $insertQuery = "insert into $database.$schema.$table values ('$randomString1', '$randomString2')";
 
-$snowflakeConnection = new SnowflakeConnection();
+$snowflakeConnection = new SnowflakePDOConnection();
 $snowflakeConnection
-    ->executeCommand("create database if not exists $database")
-    ->executeCommand("create schema if not exists $database.$schema")
+    // ->executeCommand("create database if not exists $database")
+    // ->executeCommand("create schema if not exists $database.$schema")
     ->executeCommand("create table if not exists $database.$schema.$table (col1 varchar, col2 varchar)")
     ->executeCommand("truncate $database.$schema.$table")
     ->executeCommand($insertQuery);
@@ -34,6 +34,33 @@ $rows = $snowflakeConnection->fetchAll($selectQuery);
 
 var_dump($rows);
 
+class SnowflakePDOConnection
+{
+    /**
+     * @var PDO
+     */
+    private $connection;
+
+    public function __construct()
+    {
+        $connection = new PDO("snowflake:account=" . getenv('SNOWFLAKE_ACCOUNT'), getenv('SNOWFLAKE_USERNAME'), getenv('SNOWFLAKE_PASSWORD'));
+        $connection->query("USE DATABASE " . getenv('SNOWFLAKE_DATABASE'));
+        $connection->query("USE WAREHOUSE " . getenv('SNOWFLAKE_WAREHOUSE'));
+        $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->connection = $connection;
+    }
+
+    public function fetchAll(string $sql): array
+    {
+        return $this->connection->query($sql)->fetchAll();
+    }
+
+    public function executeCommand(string $sql): SnowflakePDOConnection
+    {
+        $this->connection->query($sql);
+        return $this;
+    }
+}
 
 class SnowflakeConnection
 {

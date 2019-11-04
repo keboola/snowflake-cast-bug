@@ -59,6 +59,15 @@ COPY --from=0 /tmp/snowflake-odbc.deb /tmp/snowflake-odbc.deb
 RUN dpkg -i /tmp/snowflake-odbc.deb
 ADD ./docker/php-apache/snowflake/simba.snowflake.ini /usr/lib/snowflake/odbc/lib/simba.snowflake.ini
 
+# PDO
+ENV PHP_HOME=/usr
+WORKDIR /root
+RUN git clone https://github.com/snowflakedb/pdo_snowflake.git /root/pdo_snowflake && /root/pdo_snowflake/scripts/build_pdo_snowflake.sh
+WORKDIR /root/pdo_snowflake
+RUN phpize
+RUN php -dextension=modules/pdo_snowflake.so -m | grep pdo_snowflake
+RUN cp /root/pdo_snowflake/modules/pdo_snowflake.so /usr/local/etc/php/conf.d/pdo_snowflake.so
+RUN cp /root/pdo_snowflake/libsnowflakeclient/cacert.pem /usr/local/etc/php/conf.d/cacert.pem
 WORKDIR /var/www/html
 
 ## Composer - deps always cached unless changed
