@@ -11,6 +11,7 @@ services:
       - ./docker/php-apache/logging.conf:/etc/apache2/conf-enabled/keboola-logging.conf
       - ./docker/php-apache/snowflake/simba.snowflake.ini:/usr/lib/snowflake/odbc/lib/simba.snowflake.ini
       - ./docker/php-apache/php.ini:/usr/local/etc/php/php.ini
+      - ./docker/php-apache/pdo_snowflake.ini:/usr/local/etc/php/conf.d/pdo_snowflake.ini
     working_dir: /var/www/html
     ports:
       - "8080:80"
