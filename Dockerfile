@@ -5,7 +5,7 @@ RUN apt-get install \
         mc \
         -y
 
-RUN /usr/bin/curl https://sfc-repo.snowflakecomputing.com/odbc/linux/2.19.3/snowflake-odbc-2.19.3.x86_64.deb -o /tmp/snowflake-odbc.deb
+RUN /usr/bin/curl https://sfc-repo.snowflakecomputing.com/odbc/linux/2.20.2/snowflake-odbc-2.20.2.x86_64.deb -o /tmp/snowflake-odbc.deb
 
 FROM php:7.1-apache
 MAINTAINER Ondřej Jodas <ondrej.jodas@keboola.com>
@@ -24,7 +24,9 @@ RUN apt-get update -q \
     unixodbc-dev \
     unixodbc \
     python-setuptools \
+    python3-pip \
     -y --no-install-recommends \
+   && pip3 install -U setuptools \
    && easy_install supervisor
 
 RUN docker-php-ext-install mcrypt zip pdo_mysql pdo_pgsql pcntl \
