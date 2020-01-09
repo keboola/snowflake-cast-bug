@@ -12,10 +12,12 @@ $randomString1 = createRandomString(20000, "🐱️👬🐇🐐🦖");
 $randomString2 = createRandomString(20000, "🐱️👬🐇🐐🦖");
 $insertQuery = "insert into $database.$schema.$table values ('$randomString1', '$randomString2')";
 
+set_error_handler(function ($severity, $message, $file, $line) {
+    throw new \ErrorException($message, $severity, $severity, $file, $line);
+});
+
 $snowflakeConnection = new SnowflakeConnection();
 $snowflakeConnection
-    ->executeCommand("create database if not exists $database")
-    ->executeCommand("create schema if not exists $database.$schema")
     ->executeCommand("create table if not exists $database.$schema.$table (col1 varchar, col2 varchar)")
     ->executeCommand("truncate $database.$schema.$table")
     ->executeCommand($insertQuery);
@@ -78,7 +80,7 @@ class SnowflakeConnection
             }
             odbc_free_result($stmt);
         } catch (\Throwable $e) {
-            throw (new \Exception())->createException($e);
+            throw (new \Exception("Error executing query '$sql': {$e->getMessage()}", 0, $e));
         }
         return $rows;
     }
@@ -90,7 +92,7 @@ class SnowflakeConnection
             odbc_execute($stmt);
             odbc_free_result($stmt);
         } catch (\Throwable $e) {
-            throw (new \Exception())->createException($e);
+            throw (new \Exception("Error executing query '$sql': {$e->getMessage()}", 0, $e));
         }
         return $this;
     }
