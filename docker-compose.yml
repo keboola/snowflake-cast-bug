@@ -5,7 +5,6 @@ services:
       context: .
     image: connection_apache
     volumes:
-      # please make sure you update the volumes in apache-xdebug below as well
       - ./:/var/www/html:cached
       - ./docker/php-apache/connection.conf:/etc/apache2/sites-enabled/connection.conf
       - ./docker/php-apache/logging.conf:/etc/apache2/conf-enabled/keboola-logging.conf
