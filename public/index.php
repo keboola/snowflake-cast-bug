@@ -4,6 +4,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $dotenv = new Symfony\Component\Dotenv\Dotenv();
 $dotenv->loadEnv(__DIR__ . '/../.env');
 
+$warehouse = getenv('SNOWFLAKE_WAREHOUSE');
 $database = getenv('SNOWFLAKE_DATABASE');
 $schema = getenv('SNOWFLAKE_SCHEMA');
 $table = getenv('SNOWFLAKE_TABLE');
@@ -18,6 +19,7 @@ set_error_handler(function ($severity, $message, $file, $line) {
 
 $snowflakeConnection = new SnowflakeConnection();
 $snowflakeConnection
+    ->executeCommand("alter warehouse $warehouse resume if suspended")
     ->executeCommand("create table if not exists $database.$schema.$table (col1 varchar, col2 varchar)")
     ->executeCommand("truncate $database.$schema.$table")
     ->executeCommand($insertQuery);
